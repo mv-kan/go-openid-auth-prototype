@@ -10,6 +10,11 @@ func WriteResponse(w http.ResponseWriter, code int, message string) {
 	w.WriteHeader(code)
 }
 
+func AllowedMethods(w http.ResponseWriter, allowedMethods []string) {
+	w.Header().Add("Allow", strings.Join(allowedMethods, ", "))
+	w.WriteHeader(http.StatusMethodNotAllowed)
+}
+
 func MakeRequest(method string, url string, body string) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
