@@ -7,5 +7,6 @@ var (
 )
 
 var (
-	AUTHN_ENDPOINT = "authenticate"
+	AUTHN_ENDPOINT = "/authenticate"
+	LOGIN_ENDPOINT = "/login"
 )

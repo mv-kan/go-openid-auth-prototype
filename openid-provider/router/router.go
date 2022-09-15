@@ -10,4 +10,5 @@ import (
 func New() {
 	mux := http.NewServeMux()
 	mux.HandleFunc(vars.AUTHN_ENDPOINT, handler.Authenticate)
+	mux.HandleFunc(vars.LOGIN_ENDPOINT, handler.Login)
 }

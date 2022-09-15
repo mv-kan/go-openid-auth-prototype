@@ -1,15 +1,45 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
+
+func GetByID[T IDer](sl []T, id string) (*T, error) {
+	for i, value := range sl {
+		if value.GetID() == id {
+			return &sl[i], nil
+		}
+	}
+	return nil, fmt.Errorf("not found")
+}
+
+func ContainsID[T IDer](sl []T, id string) bool {
+	for _, value := range sl {
+		if value.GetID() == id {
+			return true
+		}
+	}
+	return false
+}
+
+func Contains[T comparable](sl []T, elem T) bool {
+	for _, value := range sl {
+		if value == elem {
+			return true
+		}
+	}
+	return false
+}
 
 func WriteResponse(w http.ResponseWriter, code int, message string) {
 	w.Write([]byte(message))
 	w.WriteHeader(code)
 }
 
+// Writes status code method is not allowed
+// Also it writes in header all allowed methods
 func AllowedMethods(w http.ResponseWriter, allowedMethods []string) {
 	w.Header().Add("Allow", strings.Join(allowedMethods, ", "))
 	w.WriteHeader(http.StatusMethodNotAllowed)
