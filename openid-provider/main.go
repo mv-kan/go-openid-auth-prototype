@@ -11,7 +11,7 @@ import (
 )
 
 func RegisterClients() {
-	redirectURI, err := url.JoinPath(vars.RP_HOST, vars.REDIRECT_URI)
+	redirectURI, err := url.JoinPath(vars.RP_URL, vars.REDIRECT_URI)
 	if err != nil {
 		log.Fatal(err)
 	}
