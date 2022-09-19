@@ -23,7 +23,7 @@ func ValidateToken(f http.HandlerFunc) http.HandlerFunc {
 
 		// check token
 		// send token to server
-		checkTokenURL, err := url.JoinPath(vars.AUTH_SERVER, vars.CHECK_TOKEN_ENDPOINT)
+		checkTokenURL, err := url.JoinPath(vars.OP_HOST, vars.CHECK_TOKEN_ENDPOINT)
 		if err != nil {
 			utils.WriteResponse(w, http.StatusInternalServerError, "internal error")
 		}

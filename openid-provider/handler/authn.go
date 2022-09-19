@@ -93,7 +93,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	internal.RequestStorage = append(internal.RequestStorage, authReqParams)
 
 	// authenticate user redirecting him to login page
-	loginRedirect, err := url.JoinPath(vars.AUTH_SERVER, vars.LOGIN_ENDPOINT)
+	loginRedirect, err := url.JoinPath(vars.OP_HOST, vars.LOGIN_ENDPOINT)
 	loginRedirectParams := fmt.Sprintf("?authRequestID=%s", authReqParams.GetID())
 	if err != nil {
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.ServerError)

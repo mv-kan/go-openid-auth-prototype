@@ -7,8 +7,9 @@ import (
 	"github.com/mv-kan/go-openid-auth-prototype/openid-provider/handler"
 )
 
-func New() {
+func New() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc(vars.AUTHN_ENDPOINT, handler.Authenticate)
 	mux.HandleFunc(vars.LOGIN_ENDPOINT, handler.Login)
+	return mux
 }
