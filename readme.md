@@ -12,4 +12,4 @@ This is prototype project purpose of which is to create simple auth server, clie
 
 # Resources 
 
-https://connect2id.com/le arn/openid-connect
+https://connect2id.com/learn/openid-connect
