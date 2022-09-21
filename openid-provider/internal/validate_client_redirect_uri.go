@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"errors"
 	"net/url"
 
 	"github.com/mv-kan/go-openid-auth-prototype/internal/utils"
@@ -12,7 +11,7 @@ func ValidateClientRedirectURI(clientID string, redirectURI string) (bool, error
 	// get client
 	client, err := utils.GetByID(ClientStorage, clientID)
 	if err != nil {
-		return false, errors.New("client does not exist")
+		return false, err
 	}
 	// check with ParseRequestURI all urls for validity and then compare them
 	_, err = url.ParseRequestURI(redirectURI)

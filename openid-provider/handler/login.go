@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"text/template"
@@ -54,20 +55,28 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// render login page
 func loginGet(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 	authReqIDs, ok := params["authRequestID"]
 	if !ok {
+		utils.WriteResponse(w, http.StatusInternalServerError, "")
 		return
 	}
 	authReqID := authReqIDs[0]
 
-	if !utils.ContainsID(internal.RequestStorage, authReqID) {
+	_, err := utils.GetByID(internal.RequestStorage, authReqID)
+	if errors.Is(err, utils.ErrNotFound) {
+		utils.ResponseJSON(w, http.StatusForbidden, map[string]string{"error": "auth request does not exist"})
+		return
+	} else if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, "")
 		return
 	}
 	renderLogin(w, authReqID, nil)
 }
 
+// check login post info
 func checkLoginPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {

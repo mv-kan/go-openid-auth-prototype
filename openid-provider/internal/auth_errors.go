@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -17,7 +18,7 @@ func AuthErrorResponse(w http.ResponseWriter, r *http.Request, authReq Authentic
 	}
 	// auth server MUST NOT redirect if redirectURI is invalid
 	ok, err := ValidateClientRedirectURI(authReq.ClientID, callback.String())
-	if err.Error() == "client does not exist" {
+	if errors.Is(err, utils.ErrNotFound) {
 		utils.ResponseJSON(w, http.StatusBadRequest, map[string]string{"error": "client does not exist"})
 		return
 	} else if err != nil {

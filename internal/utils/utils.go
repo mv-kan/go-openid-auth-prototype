@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+var (
+	ErrNotFound = fmt.Errorf("not found")
+)
+
 func ResponseJSON(w http.ResponseWriter, code int, payload any) error {
 	response, err := json.Marshal(payload)
 	if err != nil {
@@ -24,7 +28,7 @@ func GetByID[T IDer](sl []T, id string) (*T, error) {
 			return &sl[i], nil
 		}
 	}
-	return nil, fmt.Errorf("not found")
+	return nil, ErrNotFound
 }
 
 func ContainsID[T IDer](sl []T, id string) bool {
