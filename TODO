@@ -1,0 +1,18 @@
+1. Find out more about shortcuts and features:
+  1.1 NERDTree
+  1.2 Coc (haha hehe kok)
+  1.3 Neovim (windows, keybinds) 
+  1.4 Tmux
+2. find how to:
+  2.1 authoformat on save
+  2.2 lsp error highlight in real time
+  2.3 
+
+1. add errors for login handler +
+2. add logging for everything 
+  IDEAS!!!
+  we can create in internal another pacakge called log and use zap logger 
+  using this method we should find a way how we can init zap logger object in log package
+3. create auth code swap to access token
+4. create token validation between RS and OP
+
