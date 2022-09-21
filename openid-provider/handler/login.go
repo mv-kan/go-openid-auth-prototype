@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"text/template"
 
+	"github.com/mv-kan/go-openid-auth-prototype/internal/log"
 	"github.com/mv-kan/go-openid-auth-prototype/internal/utils"
 	"github.com/mv-kan/go-openid-auth-prototype/openid-provider/internal"
 )
@@ -60,6 +61,7 @@ func loginGet(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 	authReqIDs, ok := params["authRequestID"]
 	if !ok {
+		log.Debug("not parsed properly")
 		utils.WriteResponse(w, http.StatusInternalServerError, "")
 		return
 	}
@@ -67,9 +69,11 @@ func loginGet(w http.ResponseWriter, r *http.Request) {
 
 	_, err := utils.GetByID(internal.RequestStorage, authReqID)
 	if errors.Is(err, utils.ErrNotFound) {
+		log.Debug("authenticate request does not exist")
 		utils.ResponseJSON(w, http.StatusForbidden, map[string]string{"error": "auth request does not exist"})
 		return
 	} else if err != nil {
+		log.Error(err.Error())
 		utils.WriteResponse(w, http.StatusInternalServerError, "")
 		return
 	}
@@ -80,6 +84,7 @@ func loginGet(w http.ResponseWriter, r *http.Request) {
 func checkLoginPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
+		log.Error(err.Error())
 		http.Error(w, fmt.Sprintf("cannot parse form:%s", err), http.StatusInternalServerError)
 		return
 	}
@@ -88,16 +93,20 @@ func checkLoginPost(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	err = internal.CheckUsernamePassword(username, password, id)
 	if err != nil {
+		log.Error(err.Error())
 		renderLogin(w, id, err)
 		return
 	}
 	authReq, err := utils.GetByID(internal.RequestStorage, id)
 	if err != nil {
+		log.Debug(err.Error())
 		renderLogin(w, id, err)
 		return
 	}
 	url, err := authReq.GetCallbackURLAuto()
 	if err != nil {
+		// We use error function because this is out of reach to user, it purely server side thing
+		log.Error(err.Error())
 		renderLogin(w, id, err)
 		return
 	}
@@ -118,6 +127,7 @@ func renderLogin(w http.ResponseWriter, id string, err error) {
 	}
 	err = loginTmpl.Execute(w, data)
 	if err != nil {
+		log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

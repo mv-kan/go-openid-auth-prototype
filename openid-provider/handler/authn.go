@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/google/uuid"
+	"github.com/mv-kan/go-openid-auth-prototype/internal/log"
 	"github.com/mv-kan/go-openid-auth-prototype/internal/utils"
 	"github.com/mv-kan/go-openid-auth-prototype/internal/vars"
 	"github.com/mv-kan/go-openid-auth-prototype/openid-provider/internal"
@@ -42,6 +43,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	// clientID check
 	clientID, ok := params["client_id"]
 	if !ok {
+		log.Debug("auth req params missing client_id")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidRequest)
 		return
 	}
@@ -50,6 +52,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	// redirectURI check
 	redirectURI, ok := params["redirect_uri"]
 	if !ok {
+		log.Debug("auth req params missing redirect uri")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidRequest)
 		return
 	}
@@ -58,6 +61,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	// state check
 	state, ok := params["state"]
 	if !ok {
+		log.Debug("auth req params missing state")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidRequest)
 		return
 	}
@@ -66,6 +70,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	// scope check
 	scope, ok := params["scope"]
 	if !ok {
+		log.Debug("auth req params missing scope")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidRequest)
 		return
 	}
@@ -74,6 +79,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	// response type check
 	responseType, ok := params["response_type"]
 	if !ok {
+		log.Debug("auth req params missing response_type")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidRequest)
 		return
 	}
@@ -81,12 +87,14 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 
 	// verify that openid is present in scope
 	if !utils.Contains(authReqParams.Scope, "openid") {
+		log.Debug("auth req params: in scope missing openid")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidScope)
 		return
 	}
 
 	// the only available flow is Authorization code flow
 	if len(authReqParams.ResponseType) != 1 || authReqParams.ResponseType[0] != "code" {
+		log.Debug("only supported response type is code")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.UnsupportedResponseType)
 		return
 	}
@@ -96,10 +104,12 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	// check if redirect URI is valid
 	ok, err := internal.ValidateClientRedirectURI(authReqParams.ClientID, authReqParams.RedirectURI)
 	if err != nil {
+		log.Error(err.Error())
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.ServerError)
 		return
 	}
 	if !ok {
+		log.Debug("not registered regirect_uri")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.InvalidRequest)
 		return
 	}
@@ -112,6 +122,7 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 		return tmp
 	}()
 	if !utils.Contains(ids, authReqParams.ClientID) {
+		log.Debug("not registered client")
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.UnauthorizedClient)
 		return
 	}
@@ -120,9 +131,11 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	loginRedirect, err := url.JoinPath(vars.OP_URL, vars.LOGIN_ENDPOINT)
 	loginRedirectParams := fmt.Sprintf("?authRequestID=%s", authReqParams.GetID())
 	if err != nil {
+		log.Error(err.Error())
 		internal.AuthErrorResponse(w, r, authReqParams, pkg.ServerError)
 		return
 	}
+	log.Info("Successfully processed this request and redirect to " + loginRedirect + loginRedirectParams)
 	http.Redirect(w, r, loginRedirect+loginRedirectParams, http.StatusFound)
 }
 
