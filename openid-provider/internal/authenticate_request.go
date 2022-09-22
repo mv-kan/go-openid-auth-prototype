@@ -22,14 +22,17 @@ func (a AuthenticateRequest) GetCallbackURL(authCode AuthCode) (string, error) {
 	}
 
 	values := redirectURL.Query()
-	values.Add("code", string(authCode))
+	values.Add("code", authCode.ID)
 	values.Add("state", a.State)
 	redirectURL.RawQuery = values.Encode()
 	return redirectURL.String(), nil
 }
 
 func (a AuthenticateRequest) GetCallbackURLAuto() (string, error) {
-	authCode := GenerateAuthCode()
+	authCode, err := GenerateAuthCode(a.GetID())
+	if err != nil {
+		return "", err
+	}
 	url, err := a.GetCallbackURL(authCode)
 	return url, err
 }

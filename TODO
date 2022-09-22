@@ -9,10 +9,13 @@
   2.3 
 
 1. add errors for login handler +
-2. add logging for everything 
+2. add logging for everything + 
   IDEAS!!!
   we can create in internal another pacakge called log and use zap logger 
   using this method we should find a way how we can init zap logger object in log package
 3. create auth code swap to access token
+  3.1 right now create token structure in token.go
+  3.2 create token storage
+  3.3 create check token endpoint and implement it
 4. create token validation between RS and OP
 
