@@ -5,4 +5,5 @@ var (
 	ClientStorage   = make([]Client, 0)
 	UserStorage     = make([]User, 0)
 	AuthCodeStorage = make([]AuthCode, 0)
+	TokenStorage    = make([]Token, 0)
 )
