@@ -6,13 +6,17 @@ import (
 )
 
 // add auth code obj to auth code storage and returns new created auth code
-func GenerateAuthCode(authRequestID string) (AuthCode, error) {
-	if !utils.ContainsID(RequestStorage, authRequestID) {
+func GenerateAuthCode(authReq AuthenticateRequest) (AuthCode, error) {
+	if !utils.ContainsID(RequestStorage, authReq.GetID()) {
 		return AuthCode{}, ErrAuthReqDoesNotExist
 	}
 	randID := uuid.New().String()
 
-	authCode := AuthCode{ID: randID, AuthRequestID: authRequestID}
-	AuthCodeStorage = append(AuthCodeStorage, authCode)
+	authCode := AuthCode{ID: randID, AuthRequestID: authReq.GetID(), ClientID: authReq.ClientID, Scope: authReq.Scope, RedirectURI: authReq.RedirectURI, State: authReq.State}
+	var err error
+	RequestStorage, err = utils.RemoveByID(RequestStorage, authReq.GetID())
+	if err != nil {
+		return authCode, err
+	}
 	return authCode, nil
 }

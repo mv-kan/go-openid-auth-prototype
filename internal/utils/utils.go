@@ -24,14 +24,14 @@ func ResponseJSON(w http.ResponseWriter, code int, payload any) error {
 func remove[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
 }
-func RemoveByID[T IDer](sl []T, id string) error {
+func RemoveByID[T IDer](sl []T, id string) ([]T, error) {
 	for i, value := range sl {
 		if value.GetID() == id {
 			sl = remove(sl, i)
-			return nil
+			return sl, nil
 		}
 	}
-	return ErrNotFound
+	return nil, ErrNotFound
 }
 func GetByID[T IDer](sl []T, id string) (*T, error) {
 	for i, value := range sl {

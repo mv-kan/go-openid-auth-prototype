@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"text/template"
 
 	"github.com/mv-kan/go-openid-auth-prototype/internal/log"
@@ -103,7 +104,15 @@ func checkLoginPost(w http.ResponseWriter, r *http.Request) {
 		renderLogin(w, id, err)
 		return
 	}
-	url, err := authReq.GetCallbackURLAuto()
+	authCode, err := internal.GenerateAuthCode(*authReq)
+	if err != nil {
+		log.Debug(err.Error())
+		renderLogin(w, id, err)
+		return
+	}
+	// add auth code to storage
+	internal.AuthCodeStorage = append(internal.AuthCodeStorage, authCode)
+	url, err := getCallbackURL(authCode)
 	if err != nil {
 		// We use error function because this is out of reach to user, it purely server side thing
 		log.Error(err.Error())
@@ -130,4 +139,17 @@ func renderLogin(w http.ResponseWriter, id string, err error) {
 		log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func getCallbackURL(authCode internal.AuthCode) (string, error) {
+	redirectURL, err := url.Parse(authCode.RedirectURI)
+	if err != nil {
+		return "", err
+	}
+
+	values := redirectURL.Query()
+	values.Add("code", authCode.ID)
+	values.Add("state", authCode.State)
+	redirectURL.RawQuery = values.Encode()
+	return redirectURL.String(), nil
 }

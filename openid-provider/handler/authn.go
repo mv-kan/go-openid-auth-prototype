@@ -138,7 +138,3 @@ func authenticateGet(w http.ResponseWriter, r *http.Request) {
 	log.Info("Successfully processed this request and redirect to " + loginRedirect + loginRedirectParams)
 	http.Redirect(w, r, loginRedirect+loginRedirectParams, http.StatusFound)
 }
-
-func authenticatePost(w http.ResponseWriter, r *http.Request) {
-	return
-}

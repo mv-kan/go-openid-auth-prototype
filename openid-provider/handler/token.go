@@ -43,35 +43,20 @@ func tokenPost(w http.ResponseWriter, r *http.Request) {
 	}
 	// get auth code obj from storage
 	authCode, err := utils.GetByID(internal.AuthCodeStorage, code)
-	if errors.Is(err, utils.ErrNotFound) {
-		log.Debug(err.Error())
-		http.Error(w, fmt.Sprintf("cannot get auth code:%s", err), http.StatusBadRequest)
-		return
-	} else if err != nil {
+	if err != nil {
 		log.Error(err.Error())
 		http.Error(w, fmt.Sprintf("cannot get auth code:%s", err), http.StatusInternalServerError)
 		return
 	}
-	// get auth req obj from storage using auth code
-	authReq, err := utils.GetByID(internal.RequestStorage, authCode.AuthRequestID)
-	if errors.Is(err, utils.ErrNotFound) {
-		log.Debug(err.Error())
-		http.Error(w, fmt.Sprintf("cannot get auth request:%s", err), http.StatusBadRequest)
-		return
-	} else if err != nil {
-		log.Error(err.Error())
-		http.Error(w, fmt.Sprintf("cannot get auth request:%s", err), http.StatusInternalServerError)
-		return
-	}
 	// compare redirect uri
-	if authReq.RedirectURI != redirectURI {
-		log.Debug(fmt.Sprintf("redirect uris are not the same: %s(in auth req) %s (in token req)", authReq.RedirectURI, redirectURI))
+	if authCode.RedirectURI != redirectURI {
+		log.Debug(fmt.Sprintf("redirect uris are not the same: %s(in auth req) %s (in token req)", authCode.RedirectURI, redirectURI))
 		http.Error(w, "redirect uris are not the same", http.StatusBadRequest)
 		return
 	}
 	// validate clientID
-	if authReq.ClientID != clientID {
-		log.Debug(fmt.Sprintf("clientIDs are not the same clientid auth req = %s, clientid token req = %s", authReq.ClientID, clientID))
+	if authCode.ClientID != clientID {
+		log.Debug(fmt.Sprintf("clientIDs are not the same clientid auth req = %s, clientid token req = %s", authCode.ClientID, clientID))
 		http.Error(w, "client ids are not the same", http.StatusBadRequest)
 		return
 	}
@@ -79,7 +64,7 @@ func tokenPost(w http.ResponseWriter, r *http.Request) {
 	client, err := utils.GetByID(internal.ClientStorage, clientID)
 	if errors.Is(err, utils.ErrNotFound) {
 		log.Debug(fmt.Sprintf("clientID does not exist clientID=%s", clientID))
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		http.Error(w, "unauthorized client does not exist", http.StatusUnauthorized)
 		return
 	} else if err != nil {
 		log.Error(err.Error())
@@ -90,7 +75,7 @@ func tokenPost(w http.ResponseWriter, r *http.Request) {
 	clientID, clientSecret, ok := r.BasicAuth()
 	if !ok {
 		log.Debug("no basic auth is presented")
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		http.Error(w, "unauthorized no basic auth is presented", http.StatusUnauthorized)
 		return
 	}
 	clientIDHash := sha256.Sum256([]byte(clientID))
@@ -114,7 +99,7 @@ func tokenPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// after successful validation we generate token and add it to token storage
-	token, err := internal.GenerateAccessToken(*authReq)
+	token, err := internal.SwitchCodeToToken(*authCode)
 	if errors.Is(err, utils.ErrNotFound) {
 		log.Debug(fmt.Sprintf("clientID does not exist clientID=%s", clientID))
 		http.Error(w, "unauthorized", http.StatusUnauthorized)

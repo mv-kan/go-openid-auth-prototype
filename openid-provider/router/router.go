@@ -11,5 +11,6 @@ func New() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc(vars.AUTHN_ENDPOINT, handler.Authenticate)
 	mux.HandleFunc(vars.LOGIN_ENDPOINT, handler.Login)
+	mux.HandleFunc(vars.TOKEN_ENDPOINT, handler.Token)
 	return mux
 }
