@@ -32,13 +32,29 @@ func ValidateToken(f http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// get response
-		res, err := utils.MakeRequest(http.MethodPost, checkTokenURL, token)
+		//one-line post request/response...
+		response, err := http.PostForm(checkTokenURL, url.Values{
+			"token": {token},
+		})
+
+		//okay, moving on...
 		if err != nil {
+			//handle postform error
 			log.Error(err.Error())
-			utils.WriteResponse(w, http.StatusInternalServerError, "durring request error occured")
+			utils.WriteResponse(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
-		if res.StatusCode != http.StatusOK {
+
+		defer response.Body.Close()
+		// body, err := ioutil.ReadAll(response.Body)
+
+		// if err != nil {
+		// 	//handle read response error
+		// 	log.Error(err.Error())
+		// 	utils.WriteResponse(w, http.StatusInternalServerError, "internal server error")
+		// 	return
+		// }
+		if response.StatusCode != http.StatusOK {
 			log.Info("access denied, access token is not valid")
 			utils.WriteResponse(w, http.StatusUnauthorized, "access token is not valid")
 			return

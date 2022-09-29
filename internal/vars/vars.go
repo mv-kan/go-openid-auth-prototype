@@ -11,7 +11,7 @@ var (
 
 	REDIRECT_URI = "/callback"
 
-	CHECK_TOKEN_ENDPOINT = "check-token"
+	CHECK_TOKEN_ENDPOINT = "/check-token"
 )
 
 var (
