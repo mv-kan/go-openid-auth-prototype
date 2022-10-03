@@ -11,5 +11,5 @@ This is prototype project purpose of which is to create simple auth server, clie
 `resource-server` - `protected resource (requires access token to give permission to resource)`
 
 # Resources 
-
+it is stateful authorization
 https://connect2id.com/learn/openid-connect

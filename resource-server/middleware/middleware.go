@@ -18,7 +18,7 @@ func ValidateToken(f http.HandlerFunc) http.HandlerFunc {
 		tmp := strings.Split(bearerToken, "Bearer ")
 		if len(tmp) != 2 {
 			log.Error("invalid authorization header")
-			utils.WriteResponse(w, http.StatusUnauthorized, "invalid authorization header")
+			utils.WriteResponse(w, http.StatusBadRequest, "invalid authorization header")
 			return
 		}
 		token := tmp[1]

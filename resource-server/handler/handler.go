@@ -8,5 +8,5 @@ import (
 
 func GetProtectedSuperSecret(w http.ResponseWriter, r *http.Request) {
 	log.Info("get protected super secret is called")
-	w.Write([]byte("Hi, it is sure really cool access token you have here"))
+	w.Write([]byte("This is very secret message from protected resource, only authorizated and authenticated can see it."))
 }

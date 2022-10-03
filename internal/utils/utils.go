@@ -61,15 +61,15 @@ func Contains[T comparable](sl []T, elem T) bool {
 }
 
 func WriteResponse(w http.ResponseWriter, code int, message string) {
-	w.Write([]byte(message))
 	w.WriteHeader(code)
+	w.Write([]byte(message))
 }
 
 // Writes status code method is not allowed
 // Also it writes in header all allowed methods
 func AllowedMethods(w http.ResponseWriter, allowedMethods []string) {
-	w.Header().Add("Allow", strings.Join(allowedMethods, ", "))
 	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.Header().Add("Allow", strings.Join(allowedMethods, ", "))
 }
 
 func MakeRequest(method string, url string, body string) (*http.Response, error) {
